@@ -190,7 +190,8 @@ class CarController(CarControllerBase):
           can_sends.append(hyundaicanfd.create_acc_cancel(self.packer, self.CP, self.CAN, CS.cruise_info))
           self.last_button_frame = self.frame
         else:
-          can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1, Buttons.CANCEL))
+          for i in range(2):
+            can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, (CS.buttons_counter + 1 + i) % 15, Buttons.CANCEL))
           self.last_button_frame = self.frame
 
       # cruise standstill resume
@@ -199,7 +200,8 @@ class CarController(CarControllerBase):
           # TODO: resume for alt button cars
           pass
         else:
-          can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1, Buttons.RES_ACCEL))
+          for i in range(2):
+            can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, (CS.buttons_counter + 1 + i) % 15, Buttons.RES_ACCEL))
           self.last_button_frame = self.frame
 
     return can_sends

@@ -184,25 +184,22 @@ class CarController(CarControllerBase):
           if (self.frame - self.last_button_frame) * DT_CTRL >= 0.15:
             self.last_button_frame = self.frame
     else:
-      if (self.frame - self.last_button_frame) * DT_CTRL > 0.25:
-        # cruise cancel
-        if CC.cruiseControl.cancel:
-          if self.CP.flags & HyundaiFlags.CANFD_ALT_BUTTONS:
-            can_sends.append(hyundaicanfd.create_acc_cancel(self.packer, self.CP, self.CAN, CS.cruise_info))
-            self.last_button_frame = self.frame
-          else:
-            for i in range(20):
-              can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1 + i, Buttons.CANCEL))
-            self.last_button_frame = self.frame
+      # cruise cancel
+      if CC.cruiseControl.cancel:
+        if self.CP.flags & HyundaiFlags.CANFD_ALT_BUTTONS:
+          can_sends.append(hyundaicanfd.create_acc_cancel(self.packer, self.CP, self.CAN, CS.cruise_info))
+          self.last_button_frame = self.frame
+        else:
+          can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1, Buttons.CANCEL))
+          self.last_button_frame = self.frame
 
-        # cruise standstill resume
-        elif CC.cruiseControl.resume:
-          if self.CP.flags & HyundaiFlags.CANFD_ALT_BUTTONS:
-            # TODO: resume for alt button cars
-            pass
-          else:
-            for i in range(20):
-              can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1 + i, Buttons.RES_ACCEL))
-            self.last_button_frame = self.frame
+      # cruise standstill resume
+      elif CC.cruiseControl.resume:
+        if self.CP.flags & HyundaiFlags.CANFD_ALT_BUTTONS:
+          # TODO: resume for alt button cars
+          pass
+        else:
+          can_sends.append(hyundaicanfd.create_buttons(self.packer, self.CP, self.CAN, CS.buttons_counter + 1, Buttons.RES_ACCEL))
+          self.last_button_frame = self.frame
 
     return can_sends

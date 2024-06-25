@@ -93,8 +93,7 @@ bool safety_setter_thread(std::vector<Panda *> pandas) {
 
     if (p.getBool("FirmwareQueryDone")) {
       LOGW("finished FW query");
-      LOGW("\tbut staying in loop");
-      //break;
+      break;
     }
     util::sleep_for(20);
   }

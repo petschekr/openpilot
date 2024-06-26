@@ -568,6 +568,16 @@ def get_logs_to_send_sorted() -> list[str]:
   # excluding most recent (active) log file
   return sorted(logs)[:-1]
 
+@dispatcher.add_method
+def getBatterySOC() -> dict[tuple[int, int | None], bytes]: # TODO: return float
+  from openpilot.selfdrive.car.isotp_parallel_query import IsoTpParallelQuery
+
+  sendcan = messaging.pub_sock("sendcan")
+  logcan = messaging.sub_sock("can")
+
+  query = IsoTpParallelQuery(sendcan, logcan, 0, [0x7E4], [b"\x03\x22\x01\x01"], [b""])
+  results = query.get_data(0.5)
+  return results
 
 def log_handler(end_event: threading.Event) -> None:
   if PC:

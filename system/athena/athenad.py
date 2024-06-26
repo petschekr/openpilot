@@ -570,9 +570,9 @@ def get_logs_to_send_sorted() -> list[str]:
   # excluding most recent (active) log file
   return sorted(logs)[:-1]
 
-panda = Panda()
 @dispatcher.add_method
 def getBatterySOC() -> float | None:
+  panda = Panda()
   if panda.health()["safety_mode"] not in [Panda.SAFETY_ELM327, Panda.SAFETY_HYUNDAI_CANFD]:
     panda.set_safety_mode(Panda.SAFETY_ELM327, 1)
 

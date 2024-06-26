@@ -39,6 +39,8 @@ from openpilot.system.loggerd.xattr_cache import getxattr, setxattr
 from openpilot.common.swaglog import cloudlog
 from openpilot.system.version import get_build_metadata
 from openpilot.system.hardware.hw import Paths
+from panda import Panda
+from panda.python.uds import UdsClient, DATA_IDENTIFIER_TYPE, MessageTimeoutError
 
 
 ATHENA_HOST = os.getenv('ATHENA_HOST', 'wss://athena.comma.ai')
@@ -568,16 +570,17 @@ def get_logs_to_send_sorted() -> list[str]:
   # excluding most recent (active) log file
   return sorted(logs)[:-1]
 
+panda = Panda()
 @dispatcher.add_method
-def getBatterySOC() -> dict[tuple[int, int | None], bytes]: # TODO: return float
-  from openpilot.selfdrive.car.isotp_parallel_query import IsoTpParallelQuery
-
-  sendcan = messaging.pub_sock("sendcan")
-  logcan = messaging.sub_sock("can")
-
-  query = IsoTpParallelQuery(sendcan, logcan, 0, [0x7E4], [b"\x03\x22\x01\x01"], [b""])
-  results = query.get_data(0.5)
-  return results
+def getBatterySOC() -> float | None:
+  ADDR = 0x7E4 # Battery Management Unit on Ioniq 5
+  BUS = 0
+  try:
+    uds_client = UdsClient(panda, ADDR, ADDR + 8, BUS, timeout=1.0, debug=False)
+    data = bytes(uds_client.read_data_by_identifier(cast(DATA_IDENTIFIER_TYPE, 0x0101)))
+    return data[4] / 2
+  except MessageTimeoutError:
+    return None
 
 def log_handler(end_event: threading.Event) -> None:
   if PC:

@@ -573,14 +573,21 @@ def get_logs_to_send_sorted() -> list[str]:
 panda = Panda()
 @dispatcher.add_method
 def getBatterySOC() -> float | None:
+  if panda.health()["safety_mode"] not in [Panda.SAFETY_ELM327, Panda.SAFETY_HYUNDAI_CANFD]:
+    panda.set_safety_mode(Panda.SAFETY_ELM327, 1)
+
   ADDR = 0x7E4 # Battery Management Unit on Ioniq 5
   BUS = 0
-  try:
-    uds_client = UdsClient(panda, ADDR, ADDR + 8, BUS, timeout=1.0, debug=False)
-    data = bytes(uds_client.read_data_by_identifier(cast(DATA_IDENTIFIER_TYPE, 0x0101)))
-    return data[4] / 2
-  except MessageTimeoutError:
-    return None
+
+  retry_count = 5
+  for _ in range(retry_count):
+    try:
+      uds_client = UdsClient(panda, ADDR, ADDR + 8, BUS, timeout=1.0, debug=False)
+      data = bytes(uds_client.read_data_by_identifier(cast(DATA_IDENTIFIER_TYPE, 0x0101)))
+      return data[4] / 2
+    except (AssertionError, MessageTimeoutError):
+      continue
+  return None
 
 def log_handler(end_event: threading.Event) -> None:
   if PC:

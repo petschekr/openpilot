@@ -12,6 +12,8 @@ fi
 
 export STAGING_ROOT="/data/safe_staging"
 
-# export STARTED=1
+#export STARTED=1
 export FINGERPRINT=HYUNDAI_IONIQ_5
-export SKIP_FW_QUERY=1
+
+# Introduces CAN errors for some reason
+#export SKIP_FW_QUERY=1

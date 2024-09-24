@@ -110,7 +110,7 @@ void can_send_thread(std::vector<Panda *> pandas, bool fake_send) {
   }
 }
 
-void can_recv(std::vector<Panda *> &pandas, PubMaster *pm) {
+void can_recv(std::vector<Panda *> &pandas, PubMaster *pm, std::unique_ptr<ZMQPubSocket> &zpub) {
   static std::vector<can_frame> raw_can_data;
   {
     bool comms_healthy = true;
@@ -129,6 +129,9 @@ void can_recv(std::vector<Panda *> &pandas, PubMaster *pm) {
       canData[i].setSrc(raw_can_data[i].src);
     }
     pm->send("can", msg);
+
+    auto bytes = msg.toBytes();
+    zpub->send((char *)bytes.begin(), bytes.size());
   }
 }
 
@@ -443,9 +446,13 @@ void pandad_run(std::vector<Panda *> &pandas) {
   bool engaged = false;
   bool is_onroad = false;
 
+  std::unique_ptr<ZMQContext> zmq_context = std::make_unique<ZMQContext>();
+  std::unique_ptr<ZMQPubSocket> zpub = std::make_unique<ZMQPubSocket>();
+  zpub->connect(zmq_context.get(), "7015", false); // Port 7015
+
   // Main loop: receive CAN data and process states
   while (!do_exit && check_all_connected(pandas)) {
-    can_recv(pandas, &pm);
+    can_recv(pandas, &pm, zpub);
 
     // Process peripheral state at 20 Hz
     if (rk.frame() % 5 == 0) {

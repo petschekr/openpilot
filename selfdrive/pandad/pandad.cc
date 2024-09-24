@@ -254,20 +254,21 @@ std::optional<bool> send_panda_states(PubMaster *pm, const std::vector<Panda *> 
     if (!ignition_local && (health.safety_mode_pkt == (uint8_t)(cereal::CarParams::SafetyModel::HYUNDAI_CANFD))) {
       panda->set_safety_model(cereal::CarParams::SafetyModel::ELM327);
     }
+    else {
+      // Enter power save mode if ignition is off and the Panda is not in ELM327 mode
+      bool power_save_desired = !ignition_local && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::ELM327));
+      if (health.power_save_enabled_pkt != power_save_desired) {
+        panda->set_power_saving(power_save_desired);
+      }
 
-    // Enter power save mode if ignition is off and the Panda is not in ELM327 mode
-    bool power_save_desired = !ignition_local && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::ELM327));
-    if (health.power_save_enabled_pkt != power_save_desired) {
-      panda->set_power_saving(power_save_desired);
-    }
-
-    // set safety mode to NO_OUTPUT when car is off or we're not onroad. ELM327 is an alternative if we want to leverage athenad/connect
-    bool should_close_relay = !ignition_local || !is_onroad;
-    if (should_close_relay
-      && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::NO_OUTPUT))
-      && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::ELM327))
-    ) {
-      panda->set_safety_model(cereal::CarParams::SafetyModel::NO_OUTPUT);
+      // set safety mode to NO_OUTPUT when car is off or we're not onroad. ELM327 is an alternative if we want to leverage athenad/connect
+      bool should_close_relay = !ignition_local || !is_onroad;
+      if (should_close_relay
+        && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::NO_OUTPUT))
+        && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::ELM327))
+      ) {
+        panda->set_safety_model(cereal::CarParams::SafetyModel::NO_OUTPUT);
+      }
     }
 
     if (!panda->comms_healthy()) {

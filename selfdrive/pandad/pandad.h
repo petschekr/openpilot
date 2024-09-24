@@ -5,6 +5,7 @@
 
 #include "common/params.h"
 #include "selfdrive/pandad/panda.h"
+#include "msgq/impl_zmq.h"
 
 void pandad_main_thread(std::vector<std::string> serials);
 

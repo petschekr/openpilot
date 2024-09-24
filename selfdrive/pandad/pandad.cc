@@ -267,7 +267,7 @@ std::optional<bool> send_panda_states(PubMaster *pm, const std::vector<Panda *> 
         && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::NO_OUTPUT))
         && (health.safety_mode_pkt != (uint8_t)(cereal::CarParams::SafetyModel::ELM327))
       ) {
-        panda->set_safety_model(cereal::CarParams::SafetyModel::NO_OUTPUT);
+        panda->set_safety_model(cereal::CarParams::SafetyModel::ELM327);
       }
     }
 

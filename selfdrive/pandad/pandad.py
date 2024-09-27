@@ -175,5 +175,9 @@ def main() -> None:
     process.wait()
 
 
+    # Disable shut down on Ioniq 5
+    # Car charges the aux battery even when off so we don't ever need to shut down
+    params.put_bool("DisablePowerDown", True)
+
 if __name__ == "__main__":
   main()

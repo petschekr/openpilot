@@ -123,14 +123,25 @@ void can_recv(std::vector<Panda *> &pandas, PubMaster *pm, std::unique_ptr<ZMQPu
     auto evt = msg.initEvent();
     evt.setValid(comms_healthy);
     auto canData = evt.initCan(raw_can_data.size());
+
+    MessageBuilder forwardMsg;
+    auto forwardEvt = forwardMsg.initEvent();
+    auto forwardCanData = forwardEvt.initCan(raw_can_data.size());
+
     for (size_t i = 0; i < raw_can_data.size(); ++i) {
       canData[i].setAddress(raw_can_data[i].address);
       canData[i].setDat(kj::arrayPtr((uint8_t*)raw_can_data[i].dat.data(), raw_can_data[i].dat.size()));
       canData[i].setSrc(raw_can_data[i].src);
+      if (raw_can_data[i].address >= 0x700) {
+        // Only forward messages in the forwarding address range
+        forwardCanData[i].setAddress(raw_can_data[i].address);
+        forwardCanData[i].setDat(kj::arrayPtr((uint8_t*)raw_can_data[i].dat.data(), raw_can_data[i].dat.size()));
+        forwardCanData[i].setSrc(raw_can_data[i].src);
+      }
     }
     pm->send("can", msg);
 
-    auto bytes = msg.toBytes();
+    auto bytes = forwardMsg.toBytes();
     zpub->send((char *)bytes.begin(), bytes.size());
   }
 }

@@ -178,6 +178,8 @@ def main() -> None:
     # Disable shut down on Ioniq 5
     # Car charges the aux battery even when off so we don't ever need to shut down
     params.put_bool("DisablePowerDown", True)
+    # Start the MQTT forwarder
+    subprocess.run(["/data/ioniq2mqtt"], check=True)
 
 if __name__ == "__main__":
   main()

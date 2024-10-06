@@ -157,16 +157,14 @@ def main() -> NoReturn:
 
     first_run = False
 
+    # Disable shut down on Ioniq 5
+    # Car charges the aux battery even when off so we don't ever need to shut down
+    params.put_bool("DisablePowerDown", True)
+
     # run pandad with all connected serials as arguments
     os.environ['MANAGER_DAEMON'] = 'pandad'
     os.chdir(os.path.join(BASEDIR, "selfdrive/pandad"))
     subprocess.run(["./pandad", *panda_serials], check=True)
-
-    # Disable shut down on Ioniq 5
-    # Car charges the aux battery even when off so we don't ever need to shut down
-    params.put_bool("DisablePowerDown", True)
-    # Start the MQTT forwarder
-    subprocess.run(["/data/ioniq2mqtt"], check=True)
 
 if __name__ == "__main__":
   main()

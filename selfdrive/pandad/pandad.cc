@@ -138,6 +138,12 @@ void can_recv(std::vector<Panda *> &pandas, PubMaster *pm, std::unique_ptr<ZMQPu
         forwardCanData[i].setDat(kj::arrayPtr((uint8_t*)raw_can_data[i].dat.data(), raw_can_data[i].dat.size()));
         forwardCanData[i].setSrc(raw_can_data[i].src);
       }
+      else if (raw_can_data[i].address == 0x130) {
+        // Forward the gear selector message
+        forwardCanData[i].setAddress(raw_can_data[i].address);
+        forwardCanData[i].setDat(kj::arrayPtr((uint8_t*)raw_can_data[i].dat.data(), raw_can_data[i].dat.size()));
+        forwardCanData[i].setSrc(raw_can_data[i].src);
+      }
     }
     pm->send("can", msg);
 

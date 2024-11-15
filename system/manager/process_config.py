@@ -106,9 +106,10 @@ procs = [
   PythonProcess("statsd", "system.statsd", always_run),
 
   NativeProcess("ioniq2mqtt", "/data", ["./ioniq2mqtt"], always_run),
+  NativeProcess("bridge", "cereal/messaging", ["./bridge"], always_run),
 
   # debug procs
-  NativeProcess("bridge", "cereal/messaging", ["./bridge"], notcar),
+  #NativeProcess("bridge", "cereal/messaging", ["./bridge"], notcar),
   PythonProcess("webrtcd", "system.webrtc.webrtcd", notcar),
   PythonProcess("webjoystick", "tools.bodyteleop.web", notcar),
   PythonProcess("joystick", "tools.joystick.joystick_control", and_(joystick, iscar)),

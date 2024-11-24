@@ -22,6 +22,8 @@ void HudRenderer::updateState(const UIState &s) {
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
+  const auto &gps_location = sm["gpsLocation"].getGpsLocation();
+  const auto &can_data = sm["can"].getCan();
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
@@ -35,6 +37,17 @@ void HudRenderer::updateState(const UIState &s) {
   v_ego_cluster_seen = v_ego_cluster_seen || car_state.getVEgoCluster() != 0.0;
   float v_ego = v_ego_cluster_seen ? car_state.getVEgoCluster() : car_state.getVEgo();
   speed = std::max<float>(0.0f, v_ego * (is_metric ? MS_TO_KPH : MS_TO_MPH));
+
+  altitude = gps_location.getAltitude();
+
+  for (const auto &can_event : can_data) {
+    if (can_event.getSrc() == 0 && can_event.getAddress() == 0x701) {
+      const auto &data = can_event.getDat();
+      int raw_voltage = (data[12] << 8) | data[13];
+      int raw_amperage = ((((int32_t)data[10]) << 8) | data[11]);
+      power = (static_cast<float>(raw_voltage) / 10.0) * (static_cast<float>(raw_amperage) / 10.0) / 1000.0;
+    }
+  }
 }
 
 void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
@@ -49,6 +62,8 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
 
   drawSetSpeed(p, surface_rect);
   drawCurrentSpeed(p, surface_rect);
+  drawAltitude(p, surface_rect);
+  drawPower(p, surface_rect);
 
   p.restore();
 }
@@ -98,6 +113,27 @@ void HudRenderer::drawCurrentSpeed(QPainter &p, const QRect &surface_rect) {
 
   p.setFont(InterFont(66));
   drawText(p, surface_rect.center().x(), 290, is_metric ? tr("km/h") : tr("mph"), 200);
+}
+
+void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
+  QString altitudeStr = QString::number((double)altitude * METER_TO_FOOT, 'f', 1);
+  altitudeStr.append(" ft");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 125, "Altitude", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 50, altitudeStr);
+}
+void HudRenderer::drawPower(QPainter &p, const QRect &surface_rect) {
+  QString powerStr = QString::number((double)power, 'f', 1);
+  powerStr.append(" kW");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 285, "Power", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 210, powerStr);
 }
 
 void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int alpha) {

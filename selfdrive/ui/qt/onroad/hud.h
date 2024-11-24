@@ -14,10 +14,14 @@ public:
 private:
   void drawSetSpeed(QPainter &p, const QRect &surface_rect);
   void drawCurrentSpeed(QPainter &p, const QRect &surface_rect);
+  void drawAltitude(QPainter &p, const QRect &surface_rect);
+  void drawPower(QPainter &p, const QRect &surface_rect);
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
 
   float speed = 0;
   float set_speed = 0;
+  float altitude = 0;
+  float power = 0;
   bool is_cruise_set = false;
   bool is_cruise_available = true;
   bool is_metric = false;

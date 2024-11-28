@@ -14,6 +14,7 @@
 #include "selfdrive/ui/qt/sidebar.h"
 #include "selfdrive/ui/qt/widgets/controls.h"
 #include "selfdrive/ui/qt/widgets/offroad_alerts.h"
+#include "selfdrive/ui/qt/offroad/ioniq.h"
 #include "selfdrive/ui/ui.h"
 
 class OffroadHome : public QFrame {
@@ -21,8 +22,9 @@ class OffroadHome : public QFrame {
 
 public:
   explicit OffroadHome(QWidget* parent = 0);
+  void updateState(const UIState& s);
 
-signals:
+ signals:
   void openSettings(int index = 0, const QString &param = "");
 
 private:
@@ -37,6 +39,7 @@ private:
   QStackedLayout* center_layout;
   UpdateAlert *update_widget;
   OffroadAlert* alerts_widget;
+  IoniqWidget* ioniq_widget;
   QPushButton* alert_notif;
   QPushButton* update_notif;
 };

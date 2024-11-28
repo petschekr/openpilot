@@ -338,6 +338,37 @@
     </message>
 </context>
 <context>
+    <name>IoniqWidget</name>
+    <message>
+        <source>Ioniq 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Become a comma prime member at connect.comma.ai</source>
+        <translation type="unfinished">Hazte miembro de comma prime en connect.comma.ai</translation>
+    </message>
+    <message>
+        <source>PRIME FEATURES:</source>
+        <translation type="unfinished">BENEFICIOS PRIME:</translation>
+    </message>
+    <message>
+        <source>Remote access</source>
+        <translation type="unfinished">Acceso remoto</translation>
+    </message>
+    <message>
+        <source>24/7 LTE connectivity</source>
+        <translation type="unfinished">Conectividad LTE 24/7</translation>
+    </message>
+    <message>
+        <source>1 year of drive storage</source>
+        <translation type="unfinished">1 año de almacenamiento</translation>
+    </message>
+    <message>
+        <source>Remote snapshots</source>
+        <translation type="unfinished">Capturas remotas</translation>
+    </message>
+</context>
+<context>
     <name>MultiOptionDialog</name>
     <message>
         <source>Select</source>

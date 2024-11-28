@@ -337,6 +337,37 @@
     </message>
 </context>
 <context>
+    <name>IoniqWidget</name>
+    <message>
+        <source>Ioniq 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Become a comma prime member at connect.comma.ai</source>
+        <translation type="unfinished">打开connect.comma.ai以注册comma prime会员</translation>
+    </message>
+    <message>
+        <source>PRIME FEATURES:</source>
+        <translation type="unfinished">comma prime特权：</translation>
+    </message>
+    <message>
+        <source>Remote access</source>
+        <translation type="unfinished">远程访问</translation>
+    </message>
+    <message>
+        <source>24/7 LTE connectivity</source>
+        <translation type="unfinished">全天候 LTE 连接</translation>
+    </message>
+    <message>
+        <source>1 year of drive storage</source>
+        <translation type="unfinished">一年的行驶记录储存空间</translation>
+    </message>
+    <message>
+        <source>Remote snapshots</source>
+        <translation type="unfinished">远程快照</translation>
+    </message>
+</context>
+<context>
     <name>MultiOptionDialog</name>
     <message>
         <source>Select</source>

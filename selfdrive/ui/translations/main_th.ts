@@ -337,6 +337,37 @@
     </message>
 </context>
 <context>
+    <name>IoniqWidget</name>
+    <message>
+        <source>Ioniq 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Become a comma prime member at connect.comma.ai</source>
+        <translation type="unfinished">สมัครสมาชิก comma prime ได้ที่ connect.comma.ai</translation>
+    </message>
+    <message>
+        <source>PRIME FEATURES:</source>
+        <translation type="unfinished">คุณสมบัติของ PRIME:</translation>
+    </message>
+    <message>
+        <source>Remote access</source>
+        <translation type="unfinished">การเข้าถึงระยะไกล</translation>
+    </message>
+    <message>
+        <source>24/7 LTE connectivity</source>
+        <translation type="unfinished">การเชื่อมต่อ LTE แบบ 24/7</translation>
+    </message>
+    <message>
+        <source>1 year of drive storage</source>
+        <translation type="unfinished">จัดเก็บข้อมูลการขับขี่นาน 1 ปี</translation>
+    </message>
+    <message>
+        <source>Remote snapshots</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MultiOptionDialog</name>
     <message>
         <source>Select</source>

@@ -51,6 +51,8 @@ void HomeWindow::updateState(const UIState &s) {
     body->setEnabled(true);
     slayout->setCurrentWidget(body);
   }
+
+  home->updateState(s);
 }
 
 void HomeWindow::offroadTransition(bool offroad) {
@@ -133,7 +135,8 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
     left_prime_layout->addWidget(prime_user);
     left_prime_layout->addStretch();
     left_widget->addWidget(new LayoutWidget(left_prime_layout));
-    left_widget->addWidget(new PrimeAdWidget);
+    ioniq_widget = new IoniqWidget();
+    left_widget->addWidget(ioniq_widget);
     left_widget->setStyleSheet("border-radius: 10px;");
 
     connect(uiState()->prime_state, &PrimeState::changed, [left_widget]() {
@@ -192,6 +195,10 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
       font-size: 55px;
     }
   )");
+}
+
+void OffroadHome::updateState(const UIState &s) {
+  ioniq_widget->updateState(s);
 }
 
 void OffroadHome::showEvent(QShowEvent *event) {

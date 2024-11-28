@@ -14,6 +14,10 @@ static std::vector<std::string> get_services(const std::string &whitelist_str, b
     if (zmq_to_msgq && !in_whitelist) {
       continue;
     }
+    if (name == "ioniq" && !zmq_to_msgq) {
+      // The "ioniq" channel is zmq -> msgq so don't create a msgq -> zmq socket
+      continue;
+    }
     service_list.push_back(name);
   }
   return service_list;
@@ -63,8 +67,10 @@ int main(int argc, char **argv) {
   std::vector<std::string> endpoints = get_services(whitelist_str, is_zmq_to_msgq);
 
   if (is_zmq_to_msgq) {
+    printf("Starting ZMQ -> MSGQ bridge for %s\n", whitelist_str.c_str());
     zmq_to_msgq(endpoints, ip);
   } else {
+    printf("Starting MSGQ -> ZMQ bridge\n");
     msgq_to_zmq(endpoints, ip);
   }
   return 0;

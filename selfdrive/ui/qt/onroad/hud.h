@@ -22,10 +22,10 @@ private:
   float speed = 0;
   float set_speed = 0;
   double altitude = 0;
-  double power = 0;
+  float power = 0;
   bool shouldEnergyReset = true;
-  double startEnergy = 0;
-  double currentEnergy = 0;
+  float startEnergy = 0;
+  float currentEnergy = 0;
   bool is_cruise_set = false;
   bool is_cruise_available = true;
   bool is_metric = false;

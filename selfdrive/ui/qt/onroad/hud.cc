@@ -30,8 +30,7 @@ void HudRenderer::updateState(const UIState &s) {
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
-  const auto &gps_location = sm["gpsLocation"].getGpsLocation();
-  const auto &can_data = sm["can"].getCan();
+  const auto &ioniq_data = sm["ioniq"].getIoniq();
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
@@ -46,26 +45,13 @@ void HudRenderer::updateState(const UIState &s) {
   float v_ego = v_ego_cluster_seen ? car_state.getVEgoCluster() : car_state.getVEgo();
   speed = std::max<float>(0.0f, v_ego * (is_metric ? MS_TO_KPH : MS_TO_MPH));
 
-  altitude = gps_location.getAltitude();
+  altitude = ioniq_data.getAltitudeMsl();
 
-  for (const auto &can_event : can_data) {
-    if (can_event.getSrc() == 0 && can_event.getAddress() == 0x701) {
-      const auto &data = can_event.getDat();
-      int raw_voltage = (data[12] << 8) | data[13];
-      int raw_amperage = (data[10] << 8) | data[11];
-      if (data[10] & 0x80) {
-        raw_amperage |= 0xFFFF0000;
-      }
-      power = (static_cast<double>(raw_voltage) / 10.0) * (static_cast<double>(raw_amperage) / 10.0) / 1000.0;
-    }
-    if (can_event.getSrc() == 0 && can_event.getAddress() == 0x705) {
-      const auto& data = can_event.getDat();
-      int energy = ((data[28] << 8) | data[29]) * 2;
-      currentEnergy = static_cast<double>(energy) / 1000.0;
-      if (startEnergy == 0.0) {
-        startEnergy = currentEnergy;
-      }
-    }
+  power = ioniq_data.getVoltage() * ioniq_data.getCurrent() / 1000.0;
+
+  currentEnergy = ioniq_data.getRemainingEnergy() / 1000.0;
+  if (startEnergy == 0.0) {
+    startEnergy = currentEnergy;
   }
 }
 
@@ -136,7 +122,7 @@ void HudRenderer::drawCurrentSpeed(QPainter &p, const QRect &surface_rect) {
 }
 
 void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
-  QString altitudeStr = QString::number(altitude * METER_TO_FOOT, 'f', 1);
+  QString altitudeStr = QString::number(altitude * METER_TO_FOOT, 'f', 0);
   altitudeStr.append(" ft");
 
   p.setFont(InterFont(60));

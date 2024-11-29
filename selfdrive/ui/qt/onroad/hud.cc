@@ -32,6 +32,11 @@ void HudRenderer::updateState(const UIState &s) {
   const auto &car_state = sm["carState"].getCarState();
   const auto &ioniq_data = sm["ioniq"].getIoniq();
 
+  if (ioniq_data.getChargingType() != lastChargingType) {
+    lastChargingType = ioniq_data.getChargingType();
+    shouldEnergyReset = true;
+  }
+
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
   is_cruise_set = set_speed > 0 && set_speed != SET_SPEED_NA;
@@ -124,35 +129,35 @@ void HudRenderer::drawCurrentSpeed(QPainter &p, const QRect &surface_rect) {
   drawText(p, surface_rect.center().x(), 290, is_metric ? tr("km/h") : tr("mph"), 200);
 }
 
-void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
-  QString altitudeStr = QString::number(altitude * METER_TO_FOOT, 'f', 0);
-  altitudeStr.append(" ft");
-
-  p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 125, "Altitude", 200);
-
-  p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 50, altitudeStr);
-}
 void HudRenderer::drawPower(QPainter &p, const QRect &surface_rect) {
   QString powerStr = QString::number(power, 'f', 1);
   powerStr.append(" kW");
 
   p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 445, "Power", 200);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 445, "Power", 200);
 
   p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 370, powerStr);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 370, powerStr);
 }
 void HudRenderer::drawEnergy(QPainter &p, const QRect &surface_rect) {
   QString powerStr = QString::number(startEnergy - currentEnergy, 'f', 1);
   powerStr.append(" kWh");
 
   p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 285, "Energy", 200);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 285, "Energy", 200);
 
   p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomRight().x() - 165, surface_rect.bottomRight().y() - 210, powerStr);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 210, powerStr);
+}
+void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
+  QString altitudeStr = QString::number(altitude * METER_TO_FOOT, 'f', 0);
+  altitudeStr.append(" ft");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 125, "Altitude", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 50, altitudeStr);
 }
 
 void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int alpha) {

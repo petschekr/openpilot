@@ -21,11 +21,14 @@ private:
 
   float speed = 0;
   float set_speed = 0;
+
+  bool shouldEnergyReset = true;
+  cereal::Ioniq::ChargingType lastChargingType = cereal::Ioniq::ChargingType::NOT_CHARGING;
   double altitude = 0;
   float power = 0;
-  bool shouldEnergyReset = true;
   float startEnergy = 0;
   float currentEnergy = 0;
+
   bool is_cruise_set = false;
   bool is_cruise_available = true;
   bool is_metric = false;

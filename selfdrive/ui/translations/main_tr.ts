@@ -339,32 +339,16 @@
 <context>
     <name>IoniqWidget</name>
     <message>
-        <source>Ioniq 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Become a comma prime member at connect.comma.ai</source>
-        <translation type="unfinished">connect.comma.ai üzerinden comma prime üyesi olun</translation>
+        <translation type="obsolete">connect.comma.ai üzerinden comma prime üyesi olun</translation>
     </message>
     <message>
         <source>PRIME FEATURES:</source>
-        <translation type="unfinished">PRIME ABONELİĞİNİN ÖZELLİKLERİ:</translation>
+        <translation type="obsolete">PRIME ABONELİĞİNİN ÖZELLİKLERİ:</translation>
     </message>
     <message>
         <source>Remote access</source>
-        <translation type="unfinished">Uzaktan erişim</translation>
-    </message>
-    <message>
-        <source>24/7 LTE connectivity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1 year of drive storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remote snapshots</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Uzaktan erişim</translation>
     </message>
 </context>
 <context>

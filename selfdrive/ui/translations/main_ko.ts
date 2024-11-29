@@ -339,32 +339,28 @@
 <context>
     <name>IoniqWidget</name>
     <message>
-        <source>Ioniq 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Become a comma prime member at connect.comma.ai</source>
-        <translation type="unfinished">connect.comma.ai에 접속하여 comma prime 회원으로 등록하세요</translation>
+        <translation type="obsolete">connect.comma.ai에 접속하여 comma prime 회원으로 등록하세요</translation>
     </message>
     <message>
         <source>PRIME FEATURES:</source>
-        <translation type="unfinished">PRIME 기능:</translation>
+        <translation type="obsolete">PRIME 기능:</translation>
     </message>
     <message>
         <source>Remote access</source>
-        <translation type="unfinished">원격 접속</translation>
+        <translation type="obsolete">원격 접속</translation>
     </message>
     <message>
         <source>24/7 LTE connectivity</source>
-        <translation type="unfinished">항상 LTE 연결</translation>
+        <translation type="obsolete">항상 LTE 연결</translation>
     </message>
     <message>
         <source>1 year of drive storage</source>
-        <translation type="unfinished">1년간 드라이브 로그 저장</translation>
+        <translation type="obsolete">1년간 드라이브 로그 저장</translation>
     </message>
     <message>
         <source>Remote snapshots</source>
-        <translation type="unfinished">원격 스냅샷</translation>
+        <translation type="obsolete">원격 스냅샷</translation>
     </message>
 </context>
 <context>

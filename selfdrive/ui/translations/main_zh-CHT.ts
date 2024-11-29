@@ -339,32 +339,28 @@
 <context>
     <name>IoniqWidget</name>
     <message>
-        <source>Ioniq 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Become a comma prime member at connect.comma.ai</source>
-        <translation type="unfinished">成為 connect.comma.ai 的高級會員</translation>
+        <translation type="obsolete">成為 connect.comma.ai 的高級會員</translation>
     </message>
     <message>
         <source>PRIME FEATURES:</source>
-        <translation type="unfinished">高級會員特點：</translation>
+        <translation type="obsolete">高級會員特點：</translation>
     </message>
     <message>
         <source>Remote access</source>
-        <translation type="unfinished">遠端存取</translation>
+        <translation type="obsolete">遠端存取</translation>
     </message>
     <message>
         <source>24/7 LTE connectivity</source>
-        <translation type="unfinished">24/7 LTE 連線</translation>
+        <translation type="obsolete">24/7 LTE 連線</translation>
     </message>
     <message>
         <source>1 year of drive storage</source>
-        <translation type="unfinished">一年的行駛記錄儲存空間</translation>
+        <translation type="obsolete">一年的行駛記錄儲存空間</translation>
     </message>
     <message>
         <source>Remote snapshots</source>
-        <translation type="unfinished">遠端快照</translation>
+        <translation type="obsolete">遠端快照</translation>
     </message>
 </context>
 <context>

@@ -59,6 +59,15 @@ void HudRenderer::updateState(const UIState &s) {
   if (startEnergy == 0.0) {
     startEnergy = currentEnergy;
   }
+
+  maxChargePower = ioniq_data.getAvailableChargePower();
+  maxDischargePower = ioniq_data.getAvailableDischargePower();
+  minBatteryTemp = ioniq_data.getMinBatteryTemp();
+  maxBatteryTemp = ioniq_data.getMaxBatteryTemp();
+  batteryInletTemp = ioniq_data.getBatteryInletTemp();
+  heaterTemp = ioniq_data.getHeaterTemp();
+  sunrise = ioniq_data.getSunrise();
+  sunset = ioniq_data.getSunset();
 }
 
 void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
@@ -70,14 +79,27 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
   bg.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
   p.fillRect(0, 0, surface_rect.width(), UI_HEADER_HEIGHT, bg);
 
+  if (fullScreenWidth == 0) {
+    fullScreenWidth = surface_rect.width();
+  }
 
   if (is_cruise_available) {
     drawSetSpeed(p, surface_rect);
   }
   drawCurrentSpeed(p, surface_rect);
-  drawAltitude(p, surface_rect);
-  drawPower(p, surface_rect);
-  drawEnergy(p, surface_rect);
+
+  if (surface_rect.width() == fullScreenWidth) {
+    drawAltitude(p, surface_rect);
+    drawPower(p, surface_rect);
+    drawEnergy(p, surface_rect);
+  }
+  else {
+    drawChargePower(p, surface_rect);
+    drawDischargePower(p, surface_rect);
+    drawBatteryTemps(p, surface_rect);
+    drawOtherTemps(p, surface_rect);
+    drawSuntimes(p, surface_rect);
+  }
 
   p.restore();
 }
@@ -158,6 +180,60 @@ void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
 
   p.setFont(InterFont(70, QFont::Bold));
   drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 50, altitudeStr);
+}
+
+void HudRenderer::drawChargePower(QPainter &p, const QRect &surface_rect) {
+  QString str = QString::number(maxChargePower, 'f', 0);
+  str.append(" kW");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 605, "Charge", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 530, str);
+}
+void HudRenderer::drawDischargePower(QPainter &p, const QRect &surface_rect) {
+  QString str = QString::number(maxDischargePower, 'f', 0);
+  str.append(" kW");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 445, "Discharge", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 370, str);
+}
+void HudRenderer::drawBatteryTemps(QPainter &p, const QRect &surface_rect) {
+  QString str = "%1 - %2 °C";
+  str = str.arg(minBatteryTemp).arg(maxBatteryTemp);
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 285, "Battery", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 210, str);
+}
+void HudRenderer::drawOtherTemps(QPainter &p, const QRect &surface_rect) {
+  QString str = "%1 / %2 °C";
+  str = str.arg(heaterTemp).arg(batteryInletTemp);
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 125, "Heater/Inlet", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 50, str);
+}
+void HudRenderer::drawSuntimes(QPainter &p, const QRect &surface_rect) {
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 525, surface_rect.bottomLeft().y() - 125, "Sunrise", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 525, surface_rect.bottomLeft().y() - 50, QString::fromStdString(sunrise));
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 800, surface_rect.bottomLeft().y() - 125, "Sunset", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 800, surface_rect.bottomLeft().y() - 50, QString::fromStdString(sunset));
 }
 
 void HudRenderer::drawText(QPainter &p, int x, int y, const QString &text, int alpha) {

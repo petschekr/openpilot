@@ -48,7 +48,7 @@ protected:
     {cereal::DeviceState::NetworkType::CELL5_G, tr("5G")}
   };
 
-  const QRect home_btn = QRect(60, 860, 180, 180);
+  const QRect home_btn = QRect(90, 900, 120, 120);
   const QRect settings_btn = QRect(50, 35, 200, 117);
   const QColor good_color = QColor(255, 255, 255);
   const QColor warning_color = QColor(218, 202, 37);
@@ -61,4 +61,7 @@ protected:
 private:
   std::unique_ptr<PubMaster> pm;
   Networking *networking = nullptr;
+
+  float soc = 0.0;
+  float remainingEnergy = 0.0;
 };

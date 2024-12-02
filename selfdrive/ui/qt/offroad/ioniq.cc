@@ -11,34 +11,30 @@
 
 IoniqWidget::IoniqWidget(QWidget* parent) : QFrame(parent) {
   QVBoxLayout *main_layout = new QVBoxLayout(this);
-  main_layout->setContentsMargins(80, 90, 80, 60);
+  main_layout->setContentsMargins(80, 50, 80, 50);
   main_layout->setSpacing(0);
 
-  QLabel *upgrade = new QLabel("Ioniq 5");
-  upgrade->setStyleSheet("font-size: 75px; font-weight: bold;");
-  main_layout->addWidget(upgrade, 0, Qt::AlignTop);
+  QLabel *title = new QLabel("Ioniq 5");
+  title->setStyleSheet("font-size: 75px; font-weight: bold; font-style: italic;");
+  main_layout->addWidget(title, 0, Qt::AlignTop);
   main_layout->addSpacing(50);
 
-  description = new QLabel();
-  description->setStyleSheet("font-size: 56px; font-weight: light; color: white;");
-  description->setWordWrap(true);
-  main_layout->addWidget(description, 0, Qt::AlignTop);
+  primaryDetails = new QLabel();
+  primaryDetails->setStyleSheet("font-size: 60px; font-weight: light; color: white;");
+  primaryDetails->setWordWrap(true);
+  main_layout->addWidget(primaryDetails, 0, Qt::AlignTop);
+  main_layout->addSpacing(30);
+
+  secondaryDetails = new QLabel();
+  secondaryDetails->setStyleSheet("font-size: 42px; font-weight: light; color: white;");
+  secondaryDetails->setWordWrap(true);
+  main_layout->addWidget(secondaryDetails, 0, Qt::AlignTop);
 
   main_layout->addStretch();
 
-  QLabel *features = new QLabel("PRIME FEATURES:");
-  features->setStyleSheet("font-size: 41px; font-weight: bold; color: #E5E5E5;");
-  main_layout->addWidget(features, 0, Qt::AlignBottom);
-  main_layout->addSpacing(30);
-
-  QVector<QString> bullets = {"Remote access", "24/7 LTE connectivity", "1 year of drive storage", "Remote snapshots"};
-  for (auto &b : bullets) {
-    const QString check = "<b><font color='#465BEA'>✓</font></b> ";
-    QLabel *l = new QLabel(check + b);
-    l->setAlignment(Qt::AlignLeft);
-    l->setStyleSheet("font-size: 50px; margin-bottom: 15px;");
-    main_layout->addWidget(l, 0, Qt::AlignBottom);
-  }
+  sunTimes = new QLabel();
+  sunTimes->setStyleSheet("font-size: 56px; font-weight: light; color: white;");
+  main_layout->addWidget(sunTimes, 0, Qt::AlignBottom);
 
   setStyleSheet(R"(
     IoniqWidget {
@@ -53,19 +49,39 @@ void IoniqWidget::updateState(const UIState& s) {
 
   const auto& ioniq_data = sm["ioniq"].getIoniq();
 
-  QString descriptionStr = QString::number(ioniq_data.getSocDisplay(), 'f', 1);
-  descriptionStr.append("%\n");
+  QString primaryDetailsStr = QString("<b>%1%</b> - %2");
+  primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getSocDisplay(), 'f', 1));
   if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::NOT_CHARGING) {
-    descriptionStr.append("Not charging");
+    primaryDetailsStr = primaryDetailsStr.arg("Not charging");
   }
   else if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::AC) {
-    descriptionStr.append("AC slow charging");
+    primaryDetailsStr = primaryDetailsStr.arg("AC slow charging");
   }
   else if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::DC) {
-    descriptionStr.append("DC fast charging");
+    primaryDetailsStr = primaryDetailsStr.arg("DC fast charging");
   }
   else {
-    descriptionStr.append("Other charging type");
+    primaryDetailsStr = primaryDetailsStr.arg("Other charging type");
   }
-  description->setText(descriptionStr);
+  primaryDetails->setText(primaryDetailsStr);
+
+  QString secondaryDetailsStr = QString("")
+    .append("Charge Power: <b>%1 kW</b><br />")
+    .append("Discharge Power: <b>%2 kW</b><br /><br />")
+    .append("Battery Temp: <b>%3</b> - <b>%4 °C</b><br />")
+    .append("Heater Temp: <b>%5 °C</b> / Inlet Temp: <b>%6 °C</b><br />")
+    .append("AC Inlet: <b>%7 °C</b> / DC Inlet: <b>%8</b> - <b>%9 °C</b>");
+  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableChargePower(), 'f', 1));
+  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableDischargePower(), 'f', 1));
+  secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getMinBatteryTemp()).arg(ioniq_data.getMaxBatteryTemp());
+  secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getHeaterTemp()).arg(ioniq_data.getBatteryInletTemp());
+  secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getAcInletTemp()).arg(ioniq_data.getDcInlet1Temp()).arg(ioniq_data.getDcInlet2Temp());
+  secondaryDetails->setText(secondaryDetailsStr);
+
+  QString sunTimesString = QString("Sunrise: <b>%1</b><br />Sunset: <b>%2</b>");
+  sunTimes->setText(
+    sunTimesString
+      .arg(ioniq_data.getSunrise().cStr())
+      .arg(ioniq_data.getSunset().cStr())
+  );
 }

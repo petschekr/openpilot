@@ -90,6 +90,11 @@ void SubMaster::update(int timeout) {
 
     SubMessage *m = messages_.at(s);
 
+    if (msg->getSize() == 1) {
+      printf("Skipping too-short message with length 1 on socket %s\n", m->name.c_str());
+      delete msg;
+      continue;
+    }
     m->msg_reader->~FlatArrayMessageReader();
     capnp::ReaderOptions options;
     options.traversalLimitInWords = kj::maxValue; // Don't limit

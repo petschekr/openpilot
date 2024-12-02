@@ -106,6 +106,10 @@ void Sidebar::updateState(const UIState &s) {
     pandaStatus = {{tr("NO"), tr("PANDA")}, danger_color};
   }
   setProperty("pandaStatus", QVariant::fromValue(pandaStatus));
+
+  const auto& ioniq_data = sm["ioniq"].getIoniq();
+  soc = ioniq_data.getSocDisplay();
+  remainingEnergy = ioniq_data.getRemainingEnergy();
 }
 
 void Sidebar::paintEvent(QPaintEvent *event) {
@@ -133,11 +137,19 @@ void Sidebar::paintEvent(QPaintEvent *event) {
 
   p.setFont(InterFont(35));
   p.setPen(QColor(0xff, 0xff, 0xff));
-  const QRect r = QRect(58, 247, width() - 100, 50);
+  const QRect r = QRect(58, 240, width() - 100, 50);
   p.drawText(r, Qt::AlignLeft | Qt::AlignVCenter, net_type);
 
+  p.setFont(InterFont(50, QFont::DemiBold));
+  const QRect battRect = QRect(30, 730, width() - 40, 150);
+  p.drawText(battRect, Qt::AlignHCenter | Qt::AlignVCenter,
+    QString("%1%\n%2 kWh")
+      .arg(QString::number(soc, 'f', 1))
+      .arg(QString::number(remainingEnergy / 1000.0, 'f', 1))
+    );
+
   // metrics
-  drawMetric(p, temp_status.first, temp_status.second, 338);
-  drawMetric(p, panda_status.first, panda_status.second, 496);
-  drawMetric(p, connect_status.first, connect_status.second, 654);
+  drawMetric(p, temp_status.first, temp_status.second, 310);
+  drawMetric(p, panda_status.first, panda_status.second, 448);
+  drawMetric(p, connect_status.first, connect_status.second, 586);
 }

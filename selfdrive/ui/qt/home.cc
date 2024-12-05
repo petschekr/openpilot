@@ -58,6 +58,14 @@ void HomeWindow::updateState(const UIState &s) {
   }
 
   home->updateState(s);
+
+  const auto& car_state = sm["carState"].getCarState();
+  const auto buttons = car_state.getButtonEvents();
+  for (const auto& button : buttons) {
+    if (button.getType() == cereal::CarState::ButtonEvent::Type::LKAS && button.getPressed()) {
+      sidebar->setVisible(!sidebar->isVisible());
+    }
+  }
 }
 
 void HomeWindow::offroadTransition(bool offroad) {

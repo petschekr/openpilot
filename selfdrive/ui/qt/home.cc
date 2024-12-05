@@ -59,11 +59,19 @@ void HomeWindow::updateState(const UIState &s) {
 
   home->updateState(s);
 
-  const auto& car_state = sm["carState"].getCarState();
-  const auto buttons = car_state.getButtonEvents();
-  for (const auto& button : buttons) {
-    if (button.getType() == cereal::CarState::ButtonEvent::Type::LKAS && button.getPressed()) {
-      sidebar->setVisible(!sidebar->isVisible());
+  const auto& can_data = sm["can"].getCan();
+  for (const auto &can_event : can_data) {
+    if (can_event.getSrc() == 1 && can_event.getAddress() == 0x1cf) {
+      const auto &data = can_event.getDat();
+      if (data[2] & 0x80) {
+        if (!lkasPressed) {
+          sidebar->setVisible(!sidebar->isVisible());
+        }
+        lkasPressed = true;
+      }
+      else {
+        lkasPressed = false;
+      }
     }
   }
 }

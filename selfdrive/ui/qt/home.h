@@ -70,6 +70,7 @@ private:
   BodyWindow *body;
   DriverViewWindow *driver_view;
   QStackedLayout *slayout;
+  bool lkasPressed = false;
 
 private slots:
   void updateState(const UIState &s);

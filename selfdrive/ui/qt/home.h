@@ -67,6 +67,7 @@ private:
   OnroadWindow *onroad;
   BodyWindow *body;
   QStackedLayout *slayout;
+  bool lkasPressed = false;
 
 private slots:
   void updateState(const UIState &s);

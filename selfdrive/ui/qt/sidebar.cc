@@ -118,6 +118,7 @@ void Sidebar::updateState(const UIState &s) {
   const auto& ioniq_data = sm["ioniq"].getIoniq();
   soc = ioniq_data.getSocDisplay();
   remainingEnergy = ioniq_data.getRemainingEnergy();
+  update();
 }
 
 void Sidebar::paintEvent(QPaintEvent *event) {

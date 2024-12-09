@@ -17,6 +17,8 @@ private:
   void drawAltitude(QPainter &p, const QRect &surface_rect);
   void drawPower(QPainter &p, const QRect &surface_rect);
   void drawEnergy(QPainter& p, const QRect& surface_rect);
+  void drawRequestedCurrent(QPainter& p, const QRect& surface_rect);
+  void drawRequestedPower(QPainter& p, const QRect& surface_rect);
 
   void drawChargePower(QPainter& p, const QRect& surface_rect);
   void drawDischargePower(QPainter& p, const QRect& surface_rect);
@@ -35,11 +37,14 @@ private:
   cereal::Ioniq::ChargingType lastChargingType = cereal::Ioniq::ChargingType::NOT_CHARGING;
   double altitude = 0;
   float power = 0;
+  float current = 0;
   float startEnergy = 0;
   float currentEnergy = 0;
 
   float maxChargePower = 0;
   float maxDischargePower = 0;
+  float maxRequestedChargePower = 0;
+  float maxRequestedChargeCurrent = 0;
   int8_t minBatteryTemp = 0;
   int8_t maxBatteryTemp = 0;
   int8_t batteryInletTemp = 0;

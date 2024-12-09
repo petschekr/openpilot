@@ -54,6 +54,7 @@ void HudRenderer::updateState(const UIState &s) {
   altitude = ioniq_data.getAltitudeMsl();
 
   power = ioniq_data.getVoltage() * ioniq_data.getCurrent() / 1000.0;
+  current = ioniq_data.getCurrent();
 
   currentEnergy = ioniq_data.getRemainingEnergy() / 1000.0;
   if (startEnergy == 0.0) {
@@ -62,6 +63,8 @@ void HudRenderer::updateState(const UIState &s) {
 
   maxChargePower = ioniq_data.getAvailableChargePower();
   maxDischargePower = ioniq_data.getAvailableDischargePower();
+  maxRequestedChargeCurrent = ioniq_data.getMaximumChargeCurrent();
+  maxRequestedChargePower = ioniq_data.getMaximumChargePower();
   minBatteryTemp = ioniq_data.getMinBatteryTemp();
   maxBatteryTemp = ioniq_data.getMaxBatteryTemp();
   batteryInletTemp = ioniq_data.getBatteryInletTemp();
@@ -92,6 +95,10 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
     drawAltitude(p, surface_rect);
     drawPower(p, surface_rect);
     drawEnergy(p, surface_rect);
+    if (maxRequestedChargeCurrent > 0.0) {
+      drawRequestedCurrent(p, surface_rect);
+      drawRequestedPower(p, surface_rect);
+    }
   }
   else {
     drawChargePower(p, surface_rect);
@@ -170,6 +177,26 @@ void HudRenderer::drawEnergy(QPainter &p, const QRect &surface_rect) {
 
   p.setFont(InterFont(70, QFont::Bold));
   drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 210, powerStr);
+}
+void HudRenderer::drawRequestedPower(QPainter &p, const QRect &surface_rect) {
+  QString powerStr = QString::number(maxRequestedChargePower, 'f', 1);
+  powerStr.append(" kW");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 650, surface_rect.bottomLeft().y() - 445, "Requested Power", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 650, surface_rect.bottomLeft().y() - 370, powerStr);
+}
+void HudRenderer::drawRequestedCurrent(QPainter &p, const QRect &surface_rect) {
+  QString str = "%1/%2 A";
+  str = str.arg(QString::number(current * -1, 'f', 1)).arg(QString::number(maxRequestedChargeCurrent, 'f', 1));
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 650, surface_rect.bottomLeft().y() - 285, "Amps", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 650, surface_rect.bottomLeft().y() - 210, str);
 }
 void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
   QString altitudeStr = QString::number(altitude * METER_TO_FOOT, 'f', 0);

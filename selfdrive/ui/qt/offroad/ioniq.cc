@@ -58,7 +58,7 @@ void IoniqWidget::updateState(const UIState& s) {
     primaryDetailsStr = primaryDetailsStr.arg("AC slow charging<br />%1 kW");
   }
   else if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::DC) {
-    primaryDetailsStr = primaryDetailsStr.arg("DC fast charging<br />%1 kW");
+    primaryDetailsStr = primaryDetailsStr.arg("DC fast charging<br />%1 kW - (%2 kW / %3 A)");
   }
   else {
     primaryDetailsStr = primaryDetailsStr.arg("Other charging<br />%1 kW");
@@ -66,6 +66,10 @@ void IoniqWidget::updateState(const UIState& s) {
 
   if (ioniq_data.getChargingType() != cereal::Ioniq::ChargingType::NOT_CHARGING) {
     primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getVoltage() * ioniq_data.getCurrent() / -1000.0, 'f', 1));
+  }
+  if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::DC) {
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargePower(), 'f', 1));
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargeCurrent(), 'f', 1));
   }
   primaryDetails->setText(primaryDetailsStr);
 

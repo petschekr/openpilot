@@ -105,7 +105,7 @@ procs = [
   PythonProcess("uploader", "system.loggerd.uploader", always_run),
   PythonProcess("statsd", "system.statsd", always_run),
 
-  NativeProcess("ioniq2mqtt", "/data", ["./ioniq2mqtt"], always_run),
+  NativeProcess("ioniq2mqtt", "/data", ["./ioniq2mqtt"], always_run, watchdog_max_dt=5),
   NativeProcess("bridge_zmq", "cereal/messaging", ["./bridge"], always_run), # msgq to zmq
   NativeProcess("bridge_msgq", "cereal/messaging", ["./bridge", "127.0.0.1", "ioniq"], always_run), # zmq to msgq for "ioniq" service
 

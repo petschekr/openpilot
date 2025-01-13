@@ -19,23 +19,10 @@ void HudRenderer::updateState(const UIState &s) {
     speed = 0.0;
     return;
   }
-  if (s.scene.ignition && shouldEnergyReset) {
-    startEnergy = 0.0;
-    currentEnergy = 0.0;
-    shouldEnergyReset = false;
-  }
-  if (!s.scene.ignition) {
-    shouldEnergyReset = true;
-  }
 
   const auto &controls_state = sm["controlsState"].getControlsState();
   const auto &car_state = sm["carState"].getCarState();
   const auto &ioniq_data = sm["ioniq"].getIoniq();
-
-  if (ioniq_data.getChargingType() != lastChargingType) {
-    lastChargingType = ioniq_data.getChargingType();
-    shouldEnergyReset = true;
-  }
 
   // Handle older routes where vCruiseCluster is not set
   set_speed = car_state.getVCruiseCluster() == 0.0 ? controls_state.getVCruiseDEPRECATED() : car_state.getVCruiseCluster();
@@ -55,10 +42,8 @@ void HudRenderer::updateState(const UIState &s) {
   power = ioniq_data.getVoltage() * ioniq_data.getCurrent() / 1000.0;
   current = ioniq_data.getCurrent();
 
-  currentEnergy = ioniq_data.getRemainingEnergy() / 1000.0;
-  if (startEnergy == 0.0) {
-    startEnergy = currentEnergy;
-  }
+  energySinceIgnition = ioniq_data.getEnergySinceIgnition() / 1000.0;
+  energySinceCharging = ioniq_data.getEnergySinceCharging() / 1000.0;
 
   maxChargePower = ioniq_data.getAvailableChargePower();
   maxDischargePower = ioniq_data.getAvailableDischargePower();
@@ -102,6 +87,7 @@ void HudRenderer::draw(QPainter &p, const QRect &surface_rect) {
     drawDischargePower(p, surface_rect);
     drawBatteryTemps(p, surface_rect);
     drawOtherTemps(p, surface_rect);
+    drawSinceChargeEnergy(p, surface_rect);
     drawSuntimes(p, surface_rect);
   }
 
@@ -166,7 +152,7 @@ void HudRenderer::drawPower(QPainter &p, const QRect &surface_rect) {
   drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 370, powerStr);
 }
 void HudRenderer::drawEnergy(QPainter &p, const QRect &surface_rect) {
-  QString powerStr = QString::number(startEnergy - currentEnergy, 'f', 1);
+  QString powerStr = QString::number(energySinceIgnition, 'f', 1);
   powerStr.append(" kWh");
 
   p.setFont(InterFont(60));
@@ -207,34 +193,44 @@ void HudRenderer::drawAltitude(QPainter &p, const QRect &surface_rect) {
 }
 
 void HudRenderer::drawChargePower(QPainter &p, const QRect &surface_rect) {
-  QString str = QString::number(maxChargePower, 'f', 0);
-  str.append(" kW");
+  QString str = "%1 kW";
+  str = str.arg(QString::number(maxChargePower, 'f', 0));
+  QString str2 = "%1%";
+  str2 = str2.arg(QString::number(maxChargePower / 277.0 * 100.0, 'f', 0));
 
   p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 605, "Charge", 200);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 700, "Charge", 200);
 
   p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 530, str);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 625, str);
+
+  p.setFont(InterFont(60, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 565, str2);
 }
 void HudRenderer::drawDischargePower(QPainter &p, const QRect &surface_rect) {
-  QString str = QString::number(maxDischargePower, 'f', 0);
-  str.append(" kW");
+  QString str = "%1 kW";
+  str = str.arg(QString::number(maxDischargePower, 'f', 0));
+  QString str2 = "%1%";
+  str2 = str2.arg(QString::number(maxDischargePower / 277.0 * 100.0, 'f', 0));
 
   p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 445, "Discharge", 200);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 490, "Discharge", 200);
 
   p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 370, str);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 415, str);
+
+  p.setFont(InterFont(60, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 355, str2);
 }
 void HudRenderer::drawBatteryTemps(QPainter &p, const QRect &surface_rect) {
   QString str = "%1 - %2 °C";
   str = str.arg(minBatteryTemp).arg(maxBatteryTemp);
 
   p.setFont(InterFont(60));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 285, "Battery", 200);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 275, "Battery", 200);
 
   p.setFont(InterFont(70, QFont::Bold));
-  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 210, str);
+  drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 200, str);
 }
 void HudRenderer::drawOtherTemps(QPainter &p, const QRect &surface_rect) {
   QString str = "%1 / %2 °C";
@@ -245,6 +241,16 @@ void HudRenderer::drawOtherTemps(QPainter &p, const QRect &surface_rect) {
 
   p.setFont(InterFont(70, QFont::Bold));
   drawText(p, surface_rect.bottomLeft().x() + 175, surface_rect.bottomLeft().y() - 50, str);
+}
+void HudRenderer::drawSinceChargeEnergy(QPainter &p, const QRect &surface_rect) {
+  QString str = QString::number(energySinceCharging, 'f', 1);
+  str.append(" kWh");
+
+  p.setFont(InterFont(60));
+  drawText(p, surface_rect.bottomLeft().x() + 660, surface_rect.bottomLeft().y() - 275, "Since Last Charge", 200);
+
+  p.setFont(InterFont(70, QFont::Bold));
+  drawText(p, surface_rect.bottomLeft().x() + 660, surface_rect.bottomLeft().y() - 200, str);
 }
 void HudRenderer::drawSuntimes(QPainter &p, const QRect &surface_rect) {
   p.setFont(InterFont(60));

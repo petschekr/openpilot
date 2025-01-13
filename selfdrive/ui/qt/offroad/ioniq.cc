@@ -14,8 +14,8 @@ IoniqWidget::IoniqWidget(QWidget* parent) : QFrame(parent) {
   main_layout->setContentsMargins(80, 50, 80, 50);
   main_layout->setSpacing(0);
 
-  QLabel *title = new QLabel("Ioniq 5");
-  title->setStyleSheet("font-size: 75px; font-weight: bold; font-style: italic;");
+  title = new QLabel();
+  title->setStyleSheet("font-size: 75px;");
   main_layout->addWidget(title, 0, Qt::AlignTop);
   main_layout->addSpacing(50);
 
@@ -48,39 +48,48 @@ void IoniqWidget::updateState(const UIState& s) {
   const SubMaster& sm = *(s.sm);
 
   const auto& ioniq_data = sm["ioniq"].getIoniq();
+  const auto chargingType = ioniq_data.getChargingType();
 
-  QString primaryDetailsStr = QString("<b>%1%</b> - %2");
-  primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getSocDisplay(), 'f', 1));
-  if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::NOT_CHARGING) {
-    primaryDetailsStr = primaryDetailsStr.arg("Not charging");
+  QString titleString = QString("<b><i>Ioniq 5</i></b> - %1%");
+  titleString = titleString.arg(QString::number(ioniq_data.getSocDisplay(), 'f', 1));
+  title->setText(titleString);
+
+  QString primaryDetailsStr = QString("%1");
+  if (chargingType == cereal::Ioniq::ChargingType::NOT_CHARGING) {
+    primaryDetailsStr = primaryDetailsStr.arg("Last trip: <b>%1 kWh</b><br />Since charge: <b>%2 kWh</b>");
   }
-  else if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::AC) {
-    primaryDetailsStr = primaryDetailsStr.arg("AC slow charging<br />%1 kW");
+  else if (chargingType == cereal::Ioniq::ChargingType::AC) {
+    primaryDetailsStr = primaryDetailsStr.arg("AC slow charging<br /><b>%1 kW</b> - %2 kWh");
   }
-  else if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::DC) {
-    primaryDetailsStr = primaryDetailsStr.arg("DC fast charging<br />%1 kW - (%2 kW / %3 A)");
+  else if (chargingType == cereal::Ioniq::ChargingType::DC) {
+    primaryDetailsStr = primaryDetailsStr.arg("DC fast charging<br /><b>%1 / %3 kW</b> - %2 kWh<br />%4 / %5 A");
   }
   else {
-    primaryDetailsStr = primaryDetailsStr.arg("Other charging<br />%1 kW");
+    primaryDetailsStr = primaryDetailsStr.arg("Other charging<br /><b>%1 kW</b> - %2 kWh");
   }
 
-  if (ioniq_data.getChargingType() != cereal::Ioniq::ChargingType::NOT_CHARGING) {
-    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getVoltage() * ioniq_data.getCurrent() / -1000.0, 'f', 1));
+  if (chargingType == cereal::Ioniq::ChargingType::NOT_CHARGING) {
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getEnergySinceIgnition() / 1000.0, 'f', 1));
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getEnergySinceCharging() / 1000.0, 'f', 1));
   }
-  if (ioniq_data.getChargingType() == cereal::Ioniq::ChargingType::DC) {
+  else {
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getVoltage() * ioniq_data.getCurrent() / -1000.0, 'f', 1));
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getEnergySinceCharging() / -1000.0, 'f', 1));
+  }
+  if (chargingType == cereal::Ioniq::ChargingType::DC) {
     primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargePower(), 'f', 1));
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getCurrent(), 'f', 1));
     primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargeCurrent(), 'f', 1));
   }
   primaryDetails->setText(primaryDetailsStr);
 
   QString secondaryDetailsStr = QString("")
-    .append("Charge Power: <b>%1 kW</b><br />")
-    .append("Discharge Power: <b>%2 kW</b><br /><br />")
+    .append("Charge / Discharge: <b>%1 kW</b> / <b>%2 kW</b><br />")
     .append("Battery Temp: <b>%3</b> - <b>%4 °C</b><br />")
     .append("Heater Temp: <b>%5 °C</b> / Inlet Temp: <b>%6 °C</b><br />")
     .append("AC Inlet: <b>%7 °C</b> / DC Inlet: <b>%8</b> - <b>%9 °C</b>");
-  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableChargePower(), 'f', 1));
-  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableDischargePower(), 'f', 1));
+  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableChargePower(), 'f', 0));
+  secondaryDetailsStr = secondaryDetailsStr.arg(QString::number(ioniq_data.getAvailableDischargePower(), 'f', 0));
   secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getMinBatteryTemp()).arg(ioniq_data.getMaxBatteryTemp());
   secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getHeaterTemp()).arg(ioniq_data.getBatteryInletTemp());
   secondaryDetailsStr = secondaryDetailsStr.arg(ioniq_data.getAcInletTemp()).arg(ioniq_data.getDcInlet1Temp()).arg(ioniq_data.getDcInlet2Temp());

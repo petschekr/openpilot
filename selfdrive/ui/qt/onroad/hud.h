@@ -24,6 +24,7 @@ private:
   void drawDischargePower(QPainter& p, const QRect& surface_rect);
   void drawBatteryTemps(QPainter& p, const QRect& surface_rect);
   void drawOtherTemps(QPainter& p, const QRect& surface_rect);
+  void drawSinceChargeEnergy(QPainter& p, const QRect& surface_rect);
   void drawSuntimes(QPainter& p, const QRect& surface_rect);
 
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
@@ -38,8 +39,8 @@ private:
   double altitude = 0;
   float power = 0;
   float current = 0;
-  float startEnergy = 0;
-  float currentEnergy = 0;
+  float energySinceIgnition = 0;
+  float energySinceCharging = 0;
 
   float maxChargePower = 0;
   float maxDischargePower = 0;

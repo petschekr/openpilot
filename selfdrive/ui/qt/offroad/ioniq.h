@@ -13,6 +13,7 @@ public:
   explicit IoniqWidget(QWidget* parent = 0);
   void updateState(const UIState& s);
 private:
+  QLabel* title;
   QLabel* primaryDetails;
   QLabel* secondaryDetails;
   QLabel* sunTimes;

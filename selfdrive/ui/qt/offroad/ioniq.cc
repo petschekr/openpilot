@@ -78,7 +78,7 @@ void IoniqWidget::updateState(const UIState& s) {
   }
   if (chargingType == cereal::Ioniq::ChargingType::DC) {
     primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargePower(), 'f', 1));
-    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getCurrent(), 'f', 1));
+    primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getCurrent() * -1.0, 'f', 1));
     primaryDetailsStr = primaryDetailsStr.arg(QString::number(ioniq_data.getMaximumChargeCurrent(), 'f', 1));
   }
   primaryDetails->setText(primaryDetailsStr);

@@ -183,7 +183,11 @@ void Device::updateWakefulness(const UIState &s) {
     emit interactiveTimeout();
   }
 
-  setAwake(s.scene.ignition || interactive_timeout > 0);
+  const SubMaster& sm = *(s.sm);
+  const auto& ioniq_data = sm["ioniq"].getIoniq();
+  const auto chargingType = ioniq_data.getChargingType();
+
+  setAwake(s.scene.ignition || interactive_timeout > 0 || chargingType == cereal::Ioniq::ChargingType::DC);
 }
 
 UIState *uiState() {
